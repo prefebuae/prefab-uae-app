@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PREFAB UAE - Product Catalogue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #E31E24;
+            --primary-dark: #C41A1F;
+            --charcoal: #1A1A1A;
+            --dark: #0F0F0F;
+            --gray-100: #F5F5F5;
+            --gray-200: #E5E5E5;
+            --gray-300: #D4D4D4;
+            --gray-400: #A3A3A3;
+            --gray-500: #737373;
+            --gray-600: #525252;
+            --white: #FFFFFF;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--gray-100); color: var(--charcoal); overflow-x: hidden; padding-bottom: 90px; }
+        .header { background: var(--charcoal); padding: 16px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .logo { font-size: 20px; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
+        .logo span { color: var(--primary); }
+        .header-actions { display: flex; gap: 12px; }
+        .header-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.08); border: none; color: var(--white); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; position: relative; transition: all 0.2s; }
+        .header-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.15); }
+        .badge { position: absolute; top: -2px; right: -2px; background: var(--primary); color: white; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--charcoal); }
+        .search-container { position: relative; }
+        .search-bar { width: 100%; height: 44px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 0 16px 0 44px; color: var(--white); font-size: 15px; font-family: inherit; outline: none; transition: all 0.2s; }
+        .search-bar::placeholder { color: var(--gray-400); }
+        .search-bar:focus { background: rgba(255,255,255,0.15); border-color: rgba(227, 30, 36, 0.5); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 16px; }
+        .tab-nav { background: var(--charcoal); padding: 0 16px 12px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; position: sticky; top: 120px; z-index: 99; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tab-nav::-webkit-scrollbar { display: none; }
+        .tab-btn { flex-shrink: 0; padding: 10px 18px; border-radius: 100px; border: 1.5px solid rgba(255,255,255,0.1); background: transparent; color: var(--gray-400); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; }
+        .tab-btn.active { background: var(--primary); border-color: var(--primary); color: var(--white); box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3); }
+        .tab-btn:not(.active):active { background: rgba(255,255,255,0.05); }
+        .tab-icon { font-size: 14px; }
+        .content-area { min-height: calc(100vh - 230px); }
+        .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .section-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 12px; }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--charcoal); }
+        .section-action { font-size: 13px; font-weight: 600; color: var(--primary); background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .filter-bar { display: flex; gap: 8px; padding: 0 20px 16px; overflow-x: auto; scrollbar-width: none; }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-chip { flex-shrink: 0; padding: 8px 16px; border-radius: 100px; border: 1px solid var(--gray-200); background: var(--white); color: var(--gray-600); font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+        .filter-chip.active { background: var(--charcoal); color: var(--white); border-color: var(--charcoal); }
+        .filter-chip:active { transform: scale(0.95); }
+
+        /* WATERMARK STYLES */
+        .product-image-wrapper { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; background: var(--gray-100); }
+        .product-image-wrapper::after { content: 'PREFAB UAE'; position: absolute; bottom: 12px; right: 8px; font-size: 11px; font-weight: 800; color: rgba(255, 255, 255, 0.85); text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 8px rgba(0, 0, 0, 0.3); letter-spacing: 1px; pointer-events: none; z-index: 3; text-transform: uppercase; }
+        .product-image-wrapper::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 40%, rgba(227, 30, 36, 0.03) 50%, transparent 60%); pointer-events: none; z-index: 2; }
+        .product-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .product-card:hover .product-image, .product-card:active .product-image { transform: scale(1.05); }
+
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px 20px; }
+        .product-card { background: var(--white); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-sm); transition: all 0.2s; cursor: pointer; position: relative; }
+        .product-card:active { transform: scale(0.98); }
+        .product-badge { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; z-index: 4; }
+        .badge-new { background: var(--primary); color: white; }
+        .badge-sale { background: var(--warning); color: white; }
+        .badge-deal { background: linear-gradient(135deg, #FF6B6B, #E31E24); color: white; }
+        .product-info { padding: 12px; }
+        .product-category { font-size: 11px; color: var(--gray-400); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .product-name { font-size: 14px; font-weight: 600; color: var(--charcoal); line-height: 1.3; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .product-price { font-size: 16px; font-weight: 700; color: var(--charcoal); }
+        .product-old-price { font-size: 13px; color: var(--gray-400); text-decoration: line-through; }
+        .product-discount { font-size: 11px; font-weight: 700; color: var(--primary); background: rgba(227, 30, 36, 0.1); padding: 2px 6px; border-radius: 4px; }
+        .add-quote-btn { width: 100%; padding: 10px; border-radius: var(--radius-xs); border: 1.5px solid var(--charcoal); background: var(--white); color: var(--charcoal); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
+        .add-quote-btn:active { background: var(--charcoal); color: var(--white); }
+        .add-quote-btn.added { background: var(--success); border-color: var(--success); color: white; }
+
+        .promo-carousel { padding: 0 20px; margin-bottom: 20px; }
+        .promo-banner { background: linear-gradient(135deg, var(--charcoal) 0%, #2D2D2D 100%); border-radius: var(--radius); padding: 24px; color: white; position: relative; overflow: hidden; margin-bottom: 12px; }
+        .promo-banner::before { content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(227,30,36,0.3) 0%, transparent 70%); border-radius: 50%; }
+        .promo-tag { display: inline-block; background: var(--primary); color: white; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .promo-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
+        .promo-desc { font-size: 14px; color: var(--gray-300); margin-bottom: 16px; line-height: 1.4; }
+        .promo-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 100px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+        .promo-cta:active { transform: scale(0.95); background: var(--primary-dark); }
+
+        .new-strip { display: flex; gap: 12px; padding: 0 20px 20px; overflow-x: auto; scrollbar-width: none; }
+        .new-strip::-webkit-scrollbar { display: none; }
+        .new-card { flex-shrink: 0; width: 160px; background: var(--white); border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-sm); position: relative; cursor: pointer; }
+        .new-card-image-wrapper { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; background: var(--gray-100); }
+        .new-card-image-wrapper::after { content: 'PREFAB UAE'; position: absolute; bottom: 10px; right: 6px; font-size: 9px; font-weight: 800; color: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); letter-spacing: 0.8px; pointer-events: none; z-index: 3; text-transform: uppercase; }
+        .new-card-image { width: 100%; height: 100%; object-fit: cover; }
+        .new-card-info { padding: 10px; }
+        .new-card-name { font-size: 13px; font-weight: 600; color: var(--charcoal); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .new-card-date { font-size: 11px; color: var(--gray-400); }
+        .new-ribbon { position: absolute; top: 0; left: 0; background: var(--primary); color: white; font-size: 9px; font-weight: 800; padding: 4px 10px 4px 8px; clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); z-index: 4; }
+
+        .deal-hero { margin: 0 20px 20px; background: linear-gradient(135deg, #1A1A1A 0%, #2D1F1F 50%, #1A1A1A 100%); border-radius: var(--radius); padding: 28px; color: white; position: relative; overflow: hidden; border: 1px solid rgba(227, 30, 36, 0.2); }
+        .deal-hero::after { content: ''; position: absolute; top: -30%; right: -10%; width: 250px; height: 250px; background: radial-gradient(circle, rgba(227,30,36,0.25) 0%, transparent 60%); border-radius: 50%; }
+        .deal-label { display: inline-flex; align-items: center; gap: 6px; background: rgba(227, 30, 36, 0.2); border: 1px solid rgba(227, 30, 36, 0.4); color: #FF6B6B; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
+        .deal-label i { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .deal-product-name { font-size: 24px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
+        .deal-product-desc { font-size: 14px; color: var(--gray-300); margin-bottom: 20px; line-height: 1.5; }
+        .countdown { display: flex; gap: 12px; margin-bottom: 20px; }
+        .countdown-item { text-align: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-xs); padding: 12px 16px; min-width: 60px; }
+        .countdown-value { font-size: 22px; font-weight: 800; color: var(--primary); display: block; line-height: 1; }
+        .countdown-label { font-size: 10px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .deal-price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .deal-price { font-size: 32px; font-weight: 800; color: var(--primary); }
+        .deal-old-price { font-size: 18px; color: var(--gray-400); text-decoration: line-through; }
+        .deal-savings { font-size: 14px; font-weight: 600; color: var(--success); }
+        .deal-cta { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+        .deal-cta:active { transform: scale(0.98); background: var(--primary-dark); }
+
+        .past-deals { padding: 0 20px 20px; }
+        .past-deal-card { background: var(--white); border-radius: var(--radius-sm); padding: 16px; display: flex; gap: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+        .past-deal-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--gray-300); }
+        .past-deal-card.sold::before { background: var(--success); }
+        .past-deal-image-wrapper { position: relative; width: 80px; height: 80px; border-radius: var(--radius-xs); overflow: hidden; background: var(--gray-100); flex-shrink: 0; }
+        .past-deal-image-wrapper::after { content: 'PREFAB UAE'; position: absolute; bottom: 4px; right: 2px; font-size: 7px; font-weight: 800; color: rgba(255, 255, 255, 0.75); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); letter-spacing: 0.5px; pointer-events: none; z-index: 2; text-transform: uppercase; }
+        .past-deal-image { width: 100%; height: 100%; object-fit: cover; }
+        .past-deal-info { flex: 1; min-width: 0; }
+        .past-deal-name { font-size: 15px; font-weight: 600; color: var(--charcoal); margin-bottom: 4px; }
+        .past-deal-meta { font-size: 12px; color: var(--gray-400); margin-bottom: 8px; }
+        .past-deal-price { font-size: 16px; font-weight: 700; color: var(--charcoal); }
+        .past-deal-status { position: absolute; top: 12px; right: 12px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 100px; }
+        .status-sold { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+        .status-ended { background: var(--gray-100); color: var(--gray-400); }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; justify-content: space-around; padding: 8px 0 20px; z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 16px; background: none; border: none; color: var(--gray-400); font-size: 11px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; position: relative; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 22px; }
+
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--charcoal); color: white; padding: 14px 24px; border-radius: 100px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); z-index: 2000; opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast i { color: var(--success); }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+        .empty-state p { font-size: 15px; font-weight: 500; }
+        .ptr-indicator { text-align: center; padding: 16px; color: var(--gray-400); font-size: 13px; display: none; }
+        .ptr-indicator.visible { display: block; }
+        @media (min-width: 480px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="logo">PREFAB <span>UAE</span></div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="showToast('Notifications coming soon')"><i class="far fa-bell"></i><span class="badge">3</span></button>
+                <button class="header-btn" onclick="showToast('Quote cart opened')"><i class="fas fa-file-invoice"></i><span class="badge" id="quoteBadge">0</span></button>
+            </div>
+        </div>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-bar" placeholder="Search products..." id="searchInput" oninput="handleSearch(this.value)">
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('all')" data-tab="all"><span class="tab-icon">🗂️</span> All Products</button>
+        <button class="tab-btn" onclick="switchTab('promos')" data-tab="promos"><span class="tab-icon">🏷️</span> Promotions</button>
+        <button class="tab-btn" onclick="switchTab('new')" data-tab="new"><span class="tab-icon">✨</span> New Arrivals</button>
+        <button class="tab-btn" onclick="switchTab('deal')" data-tab="deal"><span class="tab-icon">🔥</span> Deal of Month</button>
+    </nav>
+
+    <!-- Content Area -->
+    <main class="content-area">
+        <!-- All Products Tab -->
+        <div class="tab-panel active" id="panel-all">
+            <div class="ptr-indicator" id="ptr-all"><i class="fas fa-spinner fa-spin"></i> Refreshing...</div>
+            <div class="section-header"><h2 class="section-title">Categories</h2></div>
+            <div class="filter-bar" id="categoryFilters">
+                <button class="filter-chip active" onclick="filterCategory('all', this)">All</button>
+                <button class="filter-chip" onclick="filterCategory('modular', this)">Modular</button>
+                <button class="filter-chip" onclick="filterCategory('office', this)">Office</button>
+                <button class="filter-chip" onclick="filterCategory('security', this)">Security</button>
+                <button class="filter-chip" onclick="filterCategory('accommodation', this)">Accommodation</button>
+                <button class="filter-chip" onclick="filterCategory('toilet', this)">Toilets</button>
+                <button class="filter-chip" onclick="filterCategory('kiosk', this)">Kiosks</button>
+                <button class="filter-chip" onclick="filterCategory('classroom', this)">Classroom</button>
+                <button class="filter-chip" onclick="filterCategory('kitchen', this)">Kitchen</button>
+                <button class="filter-chip" onclick="filterCategory('clinic', this)">Clinic</button>
+                <button class="filter-chip" onclick="filterCategory('mosque', this)">Mosque</button>
+                <button class="filter-chip" onclick="filterCategory('gym', this)">Gym</button>
+                <button class="filter-chip" onclick="filterCategory('warehouse', this)">Warehouse</button>
+                <button class="filter-chip" onclick="filterCategory('showroom', this)">Showroom</button>
+                <button class="filter-chip" onclick="filterCategory('studio', this)">Studio</button>
+                <button class="filter-chip" onclick="filterCategory('hotel', this)">Hotel</button>
+                <button class="filter-chip" onclick="filterCategory('restaurant', this)">Restaurant</button>
+                <button class="filter-chip" onclick="filterCategory('bar', this)">Bar</button>
+                <button class="filter-chip" onclick="filterCategory('reception', this)">Reception</button>
+                <button class="filter-chip" onclick="filterCategory('laboratory', this)">Laboratory</button>
+                <button class="filter-chip" onclick="filterCategory('data_center', this)">Data Center</button>
+                <button class="filter-chip" onclick="filterCategory('cold_storage', this)">Cold Storage</button>
+                <button class="filter-chip" onclick="filterCategory('garage', this)">Garage</button>
+                <button class="filter-chip" onclick="filterCategory('stables', this)">Stables</button>
+                <button class="filter-chip" onclick="filterCategory('greenhouse', this)">Greenhouse</button>
+                <button class="filter-chip" onclick="filterCategory('observation', this)">Observation</button>
+            </div>
+            <div class="section-header">
+                <h2 class="section-title" id="allTitle">All Products</h2>
+                <button class="section-action" onclick="toggleView()"><i class="fas fa-sort-amount-down"></i> Sort</button>
+            </div>
+            <div class="product-grid" id="allProductsGrid"></div>
+        </div>
+
+        <!-- Promotions Tab -->
+        <div class="tab-panel" id="panel-promos">
+            <div class="section-header"><h2 class="section-title">Active Promotions</h2></div>
+            <div class="promo-carousel">
+                <div class="promo-banner">
+                    <span class="promo-tag">Summer Sale</span>
+                    <h3 class="promo-title">20% Off All Modular Units</h3>
+                    <p class="promo-desc">Transform your space with our premium modular solutions. Limited time offer on all standard configurations.</p>
+                    <button class="promo-cta" onclick="switchTab('all'); filterCategory('modular', document.querySelectorAll('.filter-chip')[1])">Shop Now <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="promo-banner" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+                    <span class="promo-tag" style="background: #4F46E5;">Bundle Deal</span>
+                    <h3 class="promo-title">Office + Security Package</h3>
+                    <p class="promo-desc">Get a complete site setup with our office container and security cabin bundle. Save up to AED 15,000.</p>
+                    <button class="promo-cta" style="background: #4F46E5;" onclick="showToast('Bundle deal added to quote')">View Bundle <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="promo-banner" style="background: linear-gradient(135deg, #2d1f1f 0%, #1a1a1a 100%);">
+                    <span class="promo-tag">Flash Sale</span>
+                    <h3 class="promo-title">Porta Cabins Clearance</h3>
+                    <p class="promo-desc">Last season's porta cabin models at unbeatable prices. First come, first served while stocks last.</p>
+                    <button class="promo-cta" onclick="switchTab('all'); filterCategory('accommodation', document.querySelectorAll('.filter-chip')[4])">Grab Deal <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+            <div class="section-header"><h2 class="section-title">Discounted Products</h2></div>
+            <div class="product-grid" id="promoProductsGrid"></div>
+        </div>
+
+        <!-- New Arrivals Tab -->
+        <div class="tab-panel" id="panel-new">
+            <div class="section-header">
+                <h2 class="section-title">Just Landed</h2>
+                <button class="section-action" onclick="showToast('Viewing all new arrivals')">View All <i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="new-strip" id="newArrivalsStrip"></div>
+            <div class="section-header"><h2 class="section-title">Featured New Products</h2></div>
+            <div class="product-grid" id="newProductsGrid"></div>
+        </div>
+
+        <!-- Deal of Month Tab -->
+        <div class="tab-panel" id="panel-deal">
+            <div class="section-header"><h2 class="section-title">Deal of the Month</h2></div>
+            <div class="deal-hero">
+                <div class="deal-label"><i class="fas fa-fire"></i> Limited Time Offer</div>
+                <h3 class="deal-product-name">Luxury Modular Villa 40ft</h3>
+                <p class="deal-product-desc">Premium 2-bedroom modular villa with full insulation, AC pre-installation, and luxury finishes. Perfect for remote sites or residential use.</p>
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item"><span class="countdown-value" id="days">12</span><span class="countdown-label">Days</span></div>
+                    <div class="countdown-item"><span class="countdown-value" id="hours">08</span><span class="countdown-label">Hours</span></div>
+                    <div class="countdown-item"><span class="countdown-value" id="minutes">45</span><span class="countdown-label">Mins</span></div>
+                    <div class="countdown-item"><span class="countdown-value" id="seconds">32</span><span class="countdown-label">Secs</span></div>
+                </div>
+                <div class="deal-price-row">
+                    <span class="deal-price">AED 89,000</span>
+                    <span class="deal-old-price">AED 120,000</span>
+                    <span class="deal-savings">Save AED 31,000</span>
+                </div>
+                <button class="deal-cta" onclick="addToQuote('Luxury Modular Villa 40ft')"><i class="fas fa-bolt"></i> Claim This Deal</button>
+            </div>
+            <div class="section-header"><h2 class="section-title">Past Deals</h2></div>
+            <div class="past-deals" id="pastDeals"></div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="showToast('Home screen')"><i class="fas fa-home"></i><span>Home</span></button>
+        <button class="nav-item active" onclick="showToast('Catalogue screen')"><i class="fas fa-th-large"></i><span>Catalogue</span></button>
+        <button class="nav-item" onclick="showToast('Quote form')"><i class="fas fa-file-signature"></i><span>Quote</span></button>
+        <button class="nav-item" onclick="showToast('Account screen')"><i class="far fa-user"></i><span>Account</span></button>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMessage">Added to quote</span></div>
+
+    <script>
+
+        // ============================================================
+        // 25 REAL PREFAB PRODUCT CATEGORIES WITH ACTUAL IMAGES
+        // ============================================================
+        const products = [
+            // 1. MODULAR
+            { id: 1, name: "Standard Modular Cabin 20ft", category: "modular", price: 18500, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/54cef432f1ca953ea18bdb7b2a8638ba1e665834.webp", badge: null, isNew: false, date: null },
+            { id: 2, name: "Expandable Container House 40ft", category: "modular", price: 42000, oldPrice: 52000, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/567cdc36e7cbc63f1d271ac407db54efa99404f4.jpg", badge: "sale", isNew: false, date: null },
+            { id: 3, name: "Luxury Modular Villa 40ft", category: "modular", price: 89000, oldPrice: 120000, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/8cee5e7e10f276b33350859dc89b4aa2b60269a6.webp", badge: "deal", isNew: false, date: null },
+
+            // 2. OFFICE
+            { id: 4, name: "Executive Office Container", category: "office", price: 32000, oldPrice: 38000, image: "https://kimi-web-img.moonshot.cn/img/5.imimg.com/9703281074e178e9c91161bdc6536f9654ff2ed2.jpeg", badge: "sale", isNew: false, date: null },
+            { id: 5, name: "Flat Pack Office Suite", category: "office", price: 28000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/static.wixstatic.com/45143a51797169fc2e61354da0871fafb8dbd95e.png", badge: null, isNew: true, date: "1 day ago" },
+            { id: 6, name: "Premium Site Office Cabin", category: "office", price: 35000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/5.imimg.com/35f06c6a9c7c9d3253b93cc458d19585ba0e81e8.jpeg", badge: null, isNew: false, date: null },
+
+            // 3. SECURITY
+            { id: 7, name: "Security Guard Cabin", category: "security", price: 8500, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/40438a03de53e20f68fcb6869330d3782d0babd0.webp", badge: null, isNew: true, date: "2 days ago" },
+            { id: 8, name: "Armored Security Cabin", category: "security", price: 22000, oldPrice: 28000, image: "https://kimi-web-img.moonshot.cn/img/www.madoors.com.tr/46e82e3c907a4170c250701d95734125d06a3989.jpg", badge: "sale", isNew: false, date: null },
+            { id: 9, name: "Portable Sentry Box", category: "security", price: 6500, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/1dde7f3302d2ffa70bfb36aeeeea824217b29532.jpg", badge: null, isNew: false, date: null },
+
+            // 4. TOILET
+            { id: 10, name: "Portable Toilet Unit", category: "toilet", price: 4200, oldPrice: 5500, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/f5880bd63e842f328ef4b5dab9fd32b9195e1416.jpg", badge: "sale", isNew: false, date: null },
+            { id: 11, name: "Dual Restroom Cabin", category: "toilet", price: 7800, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/c9ce261b19db84fe4152a63931aef1782dbea554.webp", badge: null, isNew: true, date: "3 days ago" },
+            { id: 12, name: "Disabled Access Toilet", category: "toilet", price: 6800, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.polyjohn.com/14e833deb6ccf8f5b56c4f5e08df597de97fe3fc.jpg", badge: null, isNew: false, date: null },
+
+            // 5. ACCOMMODATION
+            { id: 13, name: "Site Accommodation Block", category: "accommodation", price: 45000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/albaitalhadiportacabins.com/a9265d83385d62ed0cb3991d822766b8cfdcf49e.jpg", badge: null, isNew: true, date: "5 days ago" },
+            { id: 14, name: "Labor Camp Block 40-man", category: "accommodation", price: 125000, oldPrice: 145000, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/eced1993ee065916cc80855fc7a31b19469d04dd.webp", badge: "sale", isNew: false, date: null },
+            { id: 15, name: "Worker Housing Camp", category: "accommodation", price: 85000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.herocont.com/5e39a3803e77b4a8bf8cd1abb3241046ae5c84d6.webp", badge: null, isNew: false, date: null },
+
+            // 6. KIOSK
+            { id: 16, name: "Retail Kiosk 10x10", category: "kiosk", price: 15000, oldPrice: 18000, image: "https://kimi-web-img.moonshot.cn/img/s.alicdn.com/e43611d5df6b1588281ec0b308ba3a57f56b084c.jpg", badge: "sale", isNew: false, date: null },
+            { id: 17, name: "Coffee Shop Kiosk", category: "kiosk", price: 22000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/0d85dfe804d59a22d990cf5d757c9fb42468f63f.jpg", badge: null, isNew: true, date: "1 week ago" },
+            { id: 18, name: "Food Court Container", category: "kiosk", price: 28000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/5b06700b8a539a34a7d473d5cdb2a288c25dd0d7.webp", badge: null, isNew: false, date: null },
+
+            // 7. CLASSROOM
+            { id: 19, name: "Modular Classroom Unit", category: "classroom", price: 55000, oldPrice: 68000, image: "https://kimi-web-img.moonshot.cn/img/module-t.com/b87539812779a71fcb058176bfd02b87a47f5044.webp", badge: "sale", isNew: false, date: null },
+            { id: 20, name: "School Building Block", category: "classroom", price: 125000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.khomehouse.com/b6a7e8b1ac8b9b320d3de5117e4ed5592c05b571.jpg", badge: null, isNew: true, date: "4 days ago" },
+            { id: 21, name: "Portable Academy Cabin", category: "classroom", price: 48000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/kcmodularbuildings.co.uk/54b4795bc559a22fa004388d0121a98f7dbf6566.jpg", badge: null, isNew: false, date: null },
+
+            // 8. KITCHEN
+            { id: 22, name: "Commercial Kitchen Container", category: "kitchen", price: 45000, oldPrice: 52000, image: "https://kimi-web-img.moonshot.cn/img/cdn.prod.website-files.com/2f79228156cf54bf61fa6625c834def91ac14f24.png", badge: "sale", isNew: false, date: null },
+            { id: 23, name: "Container Catering Unit", category: "kitchen", price: 38000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/onsite-cdn.sfo3.digitaloceanspaces.com/a2a168c19bcc7946588b1b6e6a64a429d16307b8.webp", badge: null, isNew: true, date: "6 days ago" },
+            { id: 24, name: "Mobile Kitchen 20ft", category: "kitchen", price: 32000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.etofoodcarts.com/ba85ce1de2b67ff56897d73a639f811b4c991783.jpg", badge: null, isNew: false, date: null },
+
+            // 9. CLINIC
+            { id: 25, name: "Portable Medical Clinic", category: "clinic", price: 65000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/6513dc5acf343f65d58db8e6206cc6ba9a40c508.jpg", badge: null, isNew: true, date: "1 day ago" },
+            { id: 26, name: "Mobile Health Unit", category: "clinic", price: 48000, oldPrice: 55000, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/6513dc5acf343f65d58db8e6206cc6ba9a40c508.jpg", badge: "sale", isNew: false, date: null },
+
+            // 10. MOSQUE
+            { id: 27, name: "Container Mosque Unit", category: "mosque", price: 35000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/containers-me.com/c3266d9d8fbd28bbf72c19dce88c131dd0fcc055.jpg", badge: null, isNew: true, date: "3 days ago" },
+            { id: 28, name: "Portable Prayer Room", category: "mosque", price: 22000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/2a6fd81cf2eb064663067a7b2aade93acf28e8c3.webp", badge: null, isNew: false, date: null },
+
+            // 11. GYM
+            { id: 29, name: "Container Gym 40ft", category: "gym", price: 55000, oldPrice: 68000, image: "https://kimi-web-img.moonshot.cn/img/containers-me.com/7c19798961ab8e144a5a311ccde88ec46b036b3d.jpg", badge: "sale", isNew: false, date: null },
+            { id: 30, name: "Modular Fitness Center", category: "gym", price: 78000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/containers-me.com/ef7d11b4651131eab653e20930bdd9f709440289.jpg", badge: null, isNew: true, date: "2 days ago" },
+            { id: 31, name: "Home Gym Container", category: "gym", price: 32000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/sc04.alicdn.com/81290fee5898cf90f0f311b12f6e8ba3c4063465.png", badge: null, isNew: false, date: null },
+
+            // 12. WAREHOUSE
+            { id: 32, name: "Prefab Warehouse 40ft", category: "warehouse", price: 45000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/6c69d64715ffe4fabe36ee3f17e79c405c47cf07.webp", badge: null, isNew: false, date: null },
+            { id: 33, name: "Industrial Storage Shed", category: "warehouse", price: 65000, oldPrice: 82000, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/5bdb6bc3ddb8776b1e9f76d1159a72f4acc6fd4f.webp", badge: "sale", isNew: false, date: null },
+
+            // 13. SHOWROOM
+            { id: 34, name: "Container Showroom Unit", category: "showroom", price: 38000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.tradecorp-usa.com/fe44385d0ce24233be485e39f06f6b3783568a6e.jpg", badge: null, isNew: true, date: "5 days ago" },
+            { id: 35, name: "Retail Display Container", category: "showroom", price: 42000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/universal-containers.com/e6cc3ec0cce69b5ac3fcf2428e88559a10187ba8.png", badge: null, isNew: false, date: null },
+
+            // 14. STUDIO
+            { id: 36, name: "Creative Studio Container", category: "studio", price: 28000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.steelboxcontainers.com/e75eb1f2ad9fdcf10ca41bbebbe49336d0379fc3.png", badge: null, isNew: true, date: "1 day ago" },
+            { id: 37, name: "Design Workspace 20ft", category: "studio", price: 32000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/universal-containers.com/46d450a97badf965c9dfef6c4608be6ba9888b48.webp", badge: null, isNew: false, date: null },
+
+            // 15. HOTEL
+            { id: 38, name: "Container Hotel Suite", category: "hotel", price: 95000, oldPrice: 120000, image: "https://kimi-web-img.moonshot.cn/img/www.kuboprefab.com/5f1246f724e9088ceaf661399f87356f4aa5562a.webp", badge: "sale", isNew: false, date: null },
+            { id: 39, name: "Modular Lodge Unit", category: "hotel", price: 68000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.kuboprefab.com/5f1246f724e9088ceaf661399f87356f4aa5562a.webp", badge: null, isNew: true, date: "3 days ago" },
+
+            // 16. RESTAURANT
+            { id: 40, name: "Container Restaurant 40ft", category: "restaurant", price: 55000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.etofoodcarts.com/f36bcd85f116a1c417b6244e094badc476cb4232.jpg", badge: null, isNew: false, date: null },
+            { id: 41, name: "Dining Hall Container", category: "restaurant", price: 85000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/media.prefabex.com/b8aabf86e0c9aba0781886d197c747843f7cbcb6.jpg", badge: null, isNew: true, date: "1 week ago" },
+
+            // 17. BAR
+            { id: 42, name: "Container Bar Unit", category: "bar", price: 28000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/roxboxcontainers.com/69173f693589c59b1fcd27415ac468440d924103.jpg", badge: null, isNew: true, date: "2 days ago" },
+
+            // 18. RECEPTION
+            { id: 43, name: "Modular Reception Desk", category: "reception", price: 15000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.auraadesign.co.uk/8b9ff5dab0dcaddd4bf0cc0b78a85e81dc5285fe.jpg", badge: null, isNew: false, date: null },
+            { id: 44, name: "Lobby Container Unit", category: "reception", price: 22000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/rapidoffice.furniture/db2f83d331c68ddfb4589abd1acdbc954e7424a5.jpg", badge: null, isNew: true, date: "4 days ago" },
+
+            // 19. LABORATORY
+            { id: 45, name: "Mobile Lab Container", category: "laboratory", price: 75000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.csmc.uni-hamburg.de/30e2f4a7d4c24628dedc3c4d61ba43a047135e75.jpg", badge: null, isNew: true, date: "1 day ago" },
+            { id: 46, name: "Research Container Unit", category: "laboratory", price: 65000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.craftsmenind.com/83baf6e05e24f61e13dbd903a782fd6b4eb8fc81.jpg", badge: null, isNew: false, date: null },
+
+            // 20. DATA CENTER
+            { id: 47, name: "Container Data Center", category: "data_center", price: 125000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.coolnetsystem.com/9898cf90c5d57a861accd7b29a2d24aa24e4427b.jpg", badge: null, isNew: false, date: null },
+            { id: 48, name: "Modular Server Room", category: "data_center", price: 95000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.kstar.com/dba04cb68a8f9f92f220234fb251f2503abdeb39.jpg", badge: null, isNew: true, date: "3 days ago" },
+
+            // 21. COLD STORAGE
+            { id: 49, name: "Reefer Container 20ft", category: "cold_storage", price: 55000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/1a956fab6ed0b229c47801079728bda8fa8d2e1f.webp", badge: null, isNew: false, date: null },
+            { id: 50, name: "Cold Storage Unit", category: "cold_storage", price: 68000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/19711416.fs1.hubspotusercontent-na1.net/591ec03d3226ec61e865d0e2f4fc9d954492284b.png", badge: null, isNew: true, date: "5 days ago" },
+
+            // 22. GARAGE
+            { id: 51, name: "Container Garage 40ft", category: "garage", price: 35000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.jackcooper.com/cf5171e25be3867fdde123e58b11c5f8d6d4fbcd.png", badge: null, isNew: false, date: null },
+            { id: 52, name: "Vehicle Storage Unit", category: "garage", price: 48000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/universal-containers.com/a015fb64447d8a3b1facaebbbea5943d3953a7d2.webp", badge: null, isNew: true, date: "2 days ago" },
+            { id: 53, name: "Workshop Container", category: "garage", price: 28000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.cmgcontainers.net/b4d5b7bc2ff589a7ce8004599878848a343ff1e4.jpg", badge: null, isNew: false, date: null },
+
+            // 23. STABLES
+            { id: 54, name: "Container Horse Stable", category: "stables", price: 45000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/dryboxusa.com/5d6b2437cae102652678c3597e3a88ac8e088774.jpg", badge: null, isNew: true, date: "1 week ago" },
+            { id: 55, name: "Modular Barn Unit", category: "stables", price: 55000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/midstatecontainers.com/a530d4a0e3892fde94bdbb8b512c8fcdbf4ce19e.jpg", badge: null, isNew: false, date: null },
+
+            // 24. GREENHOUSE
+            { id: 56, name: "Container Greenhouse", category: "greenhouse", price: 32000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.designboom.com/211454ce14ab6b595ba9d34dcf0caea1d47536b3.jpg", badge: null, isNew: true, date: "3 days ago" },
+            { id: 57, name: "Urban Farm Unit", category: "greenhouse", price: 38000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.hortidaily.com/699b390d45ad5c3ff968ae9ffafd189c27f52b0e.jpg", badge: null, isNew: false, date: null },
+
+            // 25. OBSERVATION
+            { id: 58, name: "Observation Tower", category: "observation", price: 65000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.tradecorp-usa.com/9f8d3b90853c2116b61b3f11f565060d1e36f007.jpg", badge: null, isNew: true, date: "2 days ago" },
+            { id: 59, name: "Lookout Cabin Container", category: "observation", price: 42000, oldPrice: null, image: "https://kimi-web-img.moonshot.cn/img/www.tradecorp-usa.com/9f8d3b90853c2116b61b3f11f565060d1e36f007.jpg", badge: null, isNew: false, date: null },
+        ];
+
+        const pastDeals = [
+            { name: "Standard Office Container", price: "AED 24,000", oldPrice: "AED 32,000", date: "May 2026", status: "sold", image: "https://kimi-web-img.moonshot.cn/img/www.miil.ee/109b8a6b40756907051be300386f7be3fc847e31.jpg" },
+            { name: "Security Cabin Twin", price: "AED 14,000", oldPrice: "AED 18,500", date: "April 2026", status: "sold", image: "https://kimi-web-img.moonshot.cn/img/www.karmod.com/2d4bb09d48682c6bbef3ef654e6ff719f66eff1c.jpg" },
+            { name: "Modular Kitchen Unit", price: "AED 35,000", oldPrice: "AED 42,000", date: "March 2026", status: "ended", image: "https://kimi-web-img.moonshot.cn/img/module-t.com/b87539812779a71fcb058176bfd02b87a47f5044.webp" },
+            { name: "Portable Classroom", price: "AED 55,000", oldPrice: "AED 68,000", date: "February 2026", status: "sold", image: "https://kimi-web-img.moonshot.cn/img/www.khomehouse.com/b6a7e8b1ac8b9b320d3de5117e4ed5592c05b571.jpg" },
+        ];
+
+        let quoteCount = 0;
+        let currentCategory = 'all';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAllProducts();
+            renderPromoProducts();
+            renderNewArrivals();
+            renderNewProducts();
+            renderPastDeals();
+            startCountdown();
+        });
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`panel-${tabName}`).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderAllProducts(filter = 'all', search = '') {
+            const grid = document.getElementById('allProductsGrid');
+            let filtered = products;
+            if (filter !== 'all') filtered = filtered.filter(p => p.category === filter);
+            if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-search"></i><p>No products found</p></div>`;
+                return;
+            }
+            grid.innerHTML = filtered.map(p => createProductCard(p)).join('');
+        }
+
+        function renderPromoProducts() {
+            const grid = document.getElementById('promoProductsGrid');
+            grid.innerHTML = products.filter(p => p.oldPrice !== null).map(p => createProductCard(p)).join('');
+        }
+
+        function renderNewArrivals() {
+            const strip = document.getElementById('newArrivalsStrip');
+            strip.innerHTML = products.filter(p => p.isNew).map(p => `
+                <div class="new-card" onclick="showToast('${p.name}')">
+                    <span class="new-ribbon">NEW</span>
+                    <div class="new-card-image-wrapper">
+                        <img src="${p.image}" class="new-card-image" alt="${p.name}" loading="lazy">
+                    </div>
+                    <div class="new-card-info">
+                        <div class="new-card-name">${p.name}</div>
+                        <div class="new-card-date">${p.date}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderNewProducts() {
+            const grid = document.getElementById('newProductsGrid');
+            grid.innerHTML = products.filter(p => p.isNew).map(p => createProductCard(p)).join('');
+        }
+
+        function renderPastDeals() {
+            const container = document.getElementById('pastDeals');
+            container.innerHTML = pastDeals.map(d => `
+                <div class="past-deal-card ${d.status}">
+                    <div class="past-deal-image-wrapper">
+                        <img src="${d.image}" class="past-deal-image" alt="${d.name}" loading="lazy">
+                    </div>
+                    <div class="past-deal-info">
+                        <div class="past-deal-name">${d.name}</div>
+                        <div class="past-deal-meta">${d.date} • Was ${d.oldPrice}</div>
+                        <div class="past-deal-price">${d.price}</div>
+                    </div>
+                    <span class="past-deal-status status-${d.status}">${d.status === 'sold' ? 'Sold Out' : 'Ended'}</span>
+                </div>
+            `).join('');
+        }
+
+        function createProductCard(p) {
+            const discount = p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
+            return `
+                <div class="product-card" onclick="showToast('${p.name} - View details')">
+                    ${p.badge ? `<span class="product-badge badge-${p.badge}">${p.badge === 'deal' ? 'DEAL' : p.badge === 'sale' ? 'SALE' : 'NEW'}</span>` : ''}
+                    ${p.isNew && !p.badge ? `<span class="product-badge badge-new">NEW</span>` : ''}
+                    <div class="product-image-wrapper">
+                        <img src="${p.image}" class="product-image" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/E31E24/FFFFFF?text=PREFAB+UAE'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">${p.category}</div>
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-price-row">
+                            <span class="product-price">AED ${p.price.toLocaleString()}</span>
+                            ${p.oldPrice ? `<span class="product-old-price">AED ${p.oldPrice.toLocaleString()}</span>` : ''}
+                            ${discount > 0 ? `<span class="product-discount">-${discount}%</span>` : ''}
+                        </div>
+                        <button class="add-quote-btn" onclick="event.stopPropagation(); addToQuote('${p.name}')">
+                            <i class="fas fa-plus"></i> Add to Quote
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function filterCategory(category, btn) {
+            currentCategory = category;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            const searchValue = document.getElementById('searchInput').value;
+            renderAllProducts(category, searchValue);
+            document.getElementById('allTitle').textContent = category === 'all' ? 'All Products' : category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ') + ' Units';
+        }
+
+        function handleSearch(value) {
+            renderAllProducts(currentCategory, value);
+        }
+
+        function addToQuote(productName) {
+            quoteCount++;
+            document.getElementById('quoteBadge').textContent = quoteCount;
+            showToast(`${productName} added to quote`);
+            const btn = event.target.closest('.add-quote-btn') || event.target;
+            if (btn.classList) {
+                btn.classList.add('added');
+                btn.innerHTML = '<i class="fas fa-check"></i> Added';
+                setTimeout(() => {
+                    btn.classList.remove('added');
+                    btn.innerHTML = '<i class="fas fa-plus"></i> Add to Quote';
+                }, 2000);
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function startCountdown() {
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + 12);
+            endDate.setHours(endDate.getHours() + 8);
+            function update() {
+                const now = new Date();
+                const diff = endDate - now;
+                if (diff <= 0) return;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        function toggleView() {
+            showToast('Sorting options: Price Low to High');
+        }
+
+        let touchStartY = 0;
+        let isRefreshing = false;
+        document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive: true });
+        document.addEventListener('touchmove', e => {
+            if (window.scrollY === 0 && !isRefreshing) {
+                const diff = e.touches[0].clientY - touchStartY;
+                if (diff > 80) {
+                    isRefreshing = true;
+                    const ptr = document.getElementById('ptr-all');
+                    if (ptr) ptr.classList.add('visible');
+                    setTimeout(() => {
+                        ptr.classList.remove('visible');
+                        isRefreshing = false;
+                        showToast('Catalogue refreshed');
+                    }, 1500);
+                }
+            }
+        }, { passive: true });
+    </script>
+</body>
+</html>
